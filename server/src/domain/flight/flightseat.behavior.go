@@ -1,4 +1,4 @@
-package fligth
+package flight
 
 func (ths *FlightSeat) OccupieSeat() error {
 	if ths.isOccupied {

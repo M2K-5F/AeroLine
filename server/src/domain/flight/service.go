@@ -1,4 +1,4 @@
-package fligth
+package flight
 
 import (
 	"aeroline/src/domain/plane"

@@ -1,7 +1,7 @@
-package fligth
+package booking
 
 import "aeroline/src/domain/shared"
 
-type FlightSeatID struct {
+type TicketID struct {
 	shared.ID
 }
