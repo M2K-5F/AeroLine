@@ -4,7 +4,7 @@ type User struct {
 	id           UserID
 	username     Username
 	permissions  []Permission
-	PasswordHash Password
+	passwordHash Password
 }
 
 func (ths User) ID() UserID {

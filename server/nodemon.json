@@ -1,0 +1,7 @@
+{
+  "watch": ["**/*.go"],
+  "ignore": ["**/testdata/**", "tmp/", "docs/", "vendor/"],
+  "ext": "go",
+  "exec": "cmd/run.bat",
+  "legacyWatch": true
+}

@@ -1,7 +1,9 @@
 package booking
 
+import "context"
+
 type IReader interface {
-	GetTickerByID(id TicketID) (*Ticket, error)
+	GetTickerByID(ctx context.Context, id TicketID) (*Ticket, error)
 }
 
 type IWriter interface {

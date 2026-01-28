@@ -1,8 +1,10 @@
 package flight
 
+import "context"
+
 type IReader interface {
-	GetFlightByID(id FlightID) (*Flight, error)
-	GetFlightSeatByID(id FlightSeatID) (*FlightSeat, error)
+	GetFlightByID(ctx context.Context, id FlightID) (*Flight, error)
+	GetFlightSeatByID(ctx context.Context, id FlightSeatID) (*FlightSeat, error)
 }
 
 type IWriter interface {

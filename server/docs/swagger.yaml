@@ -1,0 +1,19 @@
+basePath: /api
+host: localhost:7000
+info:
+  contact: {}
+  title: Fiber API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      responses:
+        "200":
+          description: 'status: ok'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      tags:
+      - health
+swagger: "2.0"

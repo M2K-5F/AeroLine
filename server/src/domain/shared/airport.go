@@ -44,4 +44,30 @@ var (
 	VaclavHavel       = Airport{Code: "PRG", City: Prague, Name: "Вацлав Гавел"}
 	ViennaAirport     = Airport{Code: "VIE", City: Vienna, Name: "Вена"}
 	ZurichAirport     = Airport{Code: "ZRH", City: Zurich, Name: "Цюрих"}
+	NullAirport       = Airport{}
 )
+
+var airports = []Airport{
+	Sheremetyevo, Domodedovo, Vnukovo,
+	Pulkovo, IstanbulNew, SabihaGokcen,
+	DubaiAirport, Suvarnabhumi, DonMueang,
+	AntalyaAirport, Zvartnots, TbilisiAirport,
+	AlmatyAirport, Manas, SimferopolAirport,
+	SochiAirport, KrasnodarAirport, Platov,
+	Koltsovo, KazanAirport, UfaAirport,
+	Strigino, Khrabrovo, Tolmachevo,
+	CharlesDeGaulle, Orly, FrankfurtAirport,
+	Heathrow, Gatwick, JFK, Newark,
+	PhuketAirport, MaleAirport,
+	HannoverAirport, VaclavHavel,
+	ViennaAirport, ZurichAirport,
+}
+
+func GetAirportByCode(code string) *Airport {
+	for i, airport := range airports {
+		if airport.Code == code {
+			return &airports[i]
+		}
+	}
+	return &NullAirport
+}

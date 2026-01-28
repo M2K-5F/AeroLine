@@ -2,20 +2,20 @@ package plane
 
 type PlaneSnapshot struct {
 	ID   PlaneID
-	Name string
+	Name Name
 }
 
 func (ths Plane) Snapshot() PlaneSnapshot {
 	return PlaneSnapshot{
 		ID:   ths.id,
-		Name: ths.name.String(),
+		Name: ths.name,
 	}
 }
 
 func RestorePlane(spt PlaneSnapshot) *Plane {
 	return &Plane{
 		id:   spt.ID,
-		name: Name(spt.Name),
+		name: spt.Name,
 	}
 }
 
@@ -24,7 +24,7 @@ type SeatSnapshot struct {
 	ID      SeatID
 	PlaneID PlaneID
 	Tag     string
-	Class   string
+	Class   Class
 }
 
 func (ths Seat) Snapshot() SeatSnapshot {
@@ -33,7 +33,7 @@ func (ths Seat) Snapshot() SeatSnapshot {
 		ID:      ths.id,
 		PlaneID: ths.planeID,
 		Tag:     ths.tag,
-		Class:   ths.class.String(),
+		Class:   ths.class,
 	}
 }
 
@@ -42,7 +42,7 @@ func RestoreSeat(spt SeatSnapshot) *Seat {
 		id:      spt.ID,
 		tag:     spt.Tag,
 		planeID: spt.PlaneID,
-		class:   Class(spt.Class),
+		class:   spt.Class,
 		serial:  spt.Serial,
 	}
 }

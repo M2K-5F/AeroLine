@@ -5,6 +5,14 @@ type Price struct {
 	currency Currency
 }
 
+func (ths Price) Amount() int64 {
+	return ths.amount
+}
+
+func (ths Price) Currency() Currency {
+	return ths.currency
+}
+
 func NewPrice(amount int64, currency string) (Price, error) {
 
 	currencyVO := Currency(currency)
@@ -21,6 +29,13 @@ func NewPrice(amount int64, currency string) (Price, error) {
 		amount:   amount,
 		currency: currencyVO,
 	}, nil
+}
+
+func RestorePrice(amount int64, currency string) Price {
+	return Price{
+		amount:   amount,
+		currency: Currency(currency),
+	}
 }
 
 const (

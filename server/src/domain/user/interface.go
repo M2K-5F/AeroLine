@@ -1,7 +1,9 @@
 package user
 
+import "context"
+
 type IReader interface {
-	GetUserByID(id UserID) (*User, error)
+	GetUserByID(ctx context.Context, id UserID) (*User, error)
 }
 
 type IWriter interface {
