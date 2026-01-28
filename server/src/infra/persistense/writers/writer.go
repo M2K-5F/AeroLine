@@ -22,23 +22,23 @@ type TransactionWriter struct {
 }
 
 func (ths TransactionWriter) SaveFlight(flight *flight.Flight) error {
-	return nil
+	return saveFlight(ths.ctx, ths.txn, flight)
 }
 
 func (ths TransactionWriter) SaveFlightSeat(flightSeat *flight.FlightSeat) error {
-	return nil
+	return saveFlightSeat(ths.ctx, ths.txn, flightSeat)
 }
 
 func (ths TransactionWriter) SavePlane(plane *plane.Plane) error {
-	return nil
+	return savePlane(ths.ctx, ths.txn, plane)
 }
 
 func (ths TransactionWriter) SaveSeat(seat *plane.Seat) error {
-	return nil
+	return saveSeat(ths.ctx, ths.txn, seat)
 }
 
 func (ths TransactionWriter) SaveTicket(ticket *booking.Ticket) error {
-	return nil
+	return saveTicket(ths.ctx, ths.txn, ticket)
 }
 
 func (ths TransactionWriter) SaveUser(user *user.User) error {

@@ -16,7 +16,9 @@ type UserReader struct {
 func (ths *UserReader) GetUserByID(ctx context.Context, id user.UserID) (*user.User, error) {
 	var row models.UserRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
-		select * from users where id = $1;
+		select * from users 
+		where id = $1 
+		limit 1;
 	`, id.String(),
 	); err != nil {
 		return nil, err
@@ -33,4 +35,10 @@ func (ths *UserReader) GetUserByID(ctx context.Context, id user.UserID) (*user.U
 		PasswordHash: user.Password(row.PasswordHash),
 		Permissions:  permissions,
 	}), nil
+}
+
+func NewUserReader(pool *pgxpool.Pool) UserReader {
+	return UserReader{
+		pool: pool,
+	}
 }

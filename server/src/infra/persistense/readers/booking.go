@@ -30,3 +30,9 @@ func (ths BookingReader) GetTicketByID(ctx context.Context, id booking.TicketID)
 		FlightSeatID: row.FlightSeatID,
 	}), nil
 }
+
+func NewBookingReader(pool *pgxpool.Pool) BookingReader {
+	return BookingReader{
+		pool: pool,
+	}
+}

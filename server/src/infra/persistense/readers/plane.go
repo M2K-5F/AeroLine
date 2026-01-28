@@ -47,3 +47,9 @@ func (ths PlaneReader) GetSeatByID(ctx context.Context, id plane.SeatID) (*plane
 		Class:   plane.Class(row.Class),
 	}), nil
 }
+
+func NewPlaneReader(pool *pgxpool.Pool) PlaneReader {
+	return PlaneReader{
+		pool: pool,
+	}
+}

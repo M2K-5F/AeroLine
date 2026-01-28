@@ -52,3 +52,9 @@ func (ths FlightReader) GetFlightSeatByID(ctx context.Context, id flight.FlightS
 		IsOccupied: row.IsOccupied,
 	}), nil
 }
+
+func NewFlightReader(pool *pgxpool.Pool) FlightReader {
+	return FlightReader{
+		pool: pool,
+	}
+}
