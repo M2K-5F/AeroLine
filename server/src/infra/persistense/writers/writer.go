@@ -2,10 +2,10 @@ package writers
 
 import (
 	"aeroline/src/application/interfaces"
-	"aeroline/src/domain/booking"
-	"aeroline/src/domain/flight"
-	"aeroline/src/domain/plane"
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/booking_domain"
+	"aeroline/src/domain/flight_domain"
+	"aeroline/src/domain/plane_domain"
+	"aeroline/src/domain/user_domain"
 	"context"
 
 	"github.com/jackc/pgx/v5"
@@ -21,27 +21,27 @@ type TransactionWriter struct {
 	ctx context.Context
 }
 
-func (ths TransactionWriter) SaveFlight(flight *flight.Flight) error {
+func (ths TransactionWriter) SaveFlight(flight *flight_domain.Flight) error {
 	return saveFlight(ths.ctx, ths.txn, flight)
 }
 
-func (ths TransactionWriter) SaveFlightSeat(flightSeat *flight.FlightSeat) error {
+func (ths TransactionWriter) SaveFlightSeat(flightSeat *flight_domain.FlightSeat) error {
 	return saveFlightSeat(ths.ctx, ths.txn, flightSeat)
 }
 
-func (ths TransactionWriter) SavePlane(plane *plane.Plane) error {
+func (ths TransactionWriter) SavePlane(plane *plane_domain.Plane) error {
 	return savePlane(ths.ctx, ths.txn, plane)
 }
 
-func (ths TransactionWriter) SaveSeat(seat *plane.Seat) error {
+func (ths TransactionWriter) SaveSeat(seat *plane_domain.Seat) error {
 	return saveSeat(ths.ctx, ths.txn, seat)
 }
 
-func (ths TransactionWriter) SaveTicket(ticket *booking.Ticket) error {
+func (ths TransactionWriter) SaveTicket(ticket *booking_domain.Ticket) error {
 	return saveTicket(ths.ctx, ths.txn, ticket)
 }
 
-func (ths TransactionWriter) SaveUser(user *user.User) error {
+func (ths TransactionWriter) SaveUser(user *user_domain.User) error {
 	return saveUser(ths.ctx, ths.txn, user)
 }
 

@@ -2,14 +2,14 @@ package plane_usecase
 
 import (
 	"aeroline/src/application/interfaces"
-	"aeroline/src/domain/plane"
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/plane_domain"
+	"aeroline/src/domain/user_domain"
 )
 
 type DepsModule struct {
 	writer   interfaces.IWriter
-	userRdr  user.IReader
-	planeRdr plane.IReader
+	userRdr  user_domain.IReader
+	planeRdr plane_domain.IReader
 }
 
 type UseCase struct {

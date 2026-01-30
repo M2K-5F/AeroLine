@@ -1,7 +1,7 @@
 package rest_utils
 
 import (
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/user_domain"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -9,7 +9,7 @@ import (
 
 var validatorSgt = validator.New()
 
-func ValidateAndGetBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
+func ValidateAndGetCommand[RequestType any](c fiber.Ctx) (*RequestType, error) {
 	var request RequestType
 	if err := c.Bind().Body(&request); err != nil {
 		return nil, err
@@ -22,12 +22,12 @@ func ValidateAndGetBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
 	return &request, nil
 }
 
-func GetUserId(c fiber.Ctx) (user.UserID, error) {
+func GetUserId(c fiber.Ctx) (user_domain.UserID, error) {
 	plainID := c.Locals("X-userID").(string)
-	var userID user.UserID
+	var userID user_domain.UserID
 	err := userID.Scan(plainID)
 	if err != nil {
-		return user.UserID{}, err
+		return user_domain.UserID{}, err
 	}
 
 	return userID, nil

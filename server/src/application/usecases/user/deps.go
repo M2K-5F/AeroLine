@@ -2,12 +2,12 @@ package user_usecase
 
 import (
 	"aeroline/src/application/interfaces"
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/user_domain"
 )
 
 type DepsModule struct {
 	Writer  interfaces.IWriter
-	UserRdr user.IReader
+	UserRdr user_domain.IReader
 }
 
 type UseCase struct {

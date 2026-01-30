@@ -1,7 +1,7 @@
 package readers
 
 import (
-	"aeroline/src/domain/plane"
+	"aeroline/src/domain/plane_domain"
 	"aeroline/src/infra/persistense/models"
 	"context"
 
@@ -13,7 +13,7 @@ type PlaneReader struct {
 	pool *pgxpool.Pool
 }
 
-func (ths PlaneReader) GetPlaneByID(ctx context.Context, id plane.PlaneID) (*plane.Plane, error) {
+func (ths PlaneReader) GetPlaneByID(ctx context.Context, id plane_domain.PlaneID) (*plane_domain.Plane, error) {
 	var row models.PlaneRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
 		select * from planes 
@@ -23,13 +23,13 @@ func (ths PlaneReader) GetPlaneByID(ctx context.Context, id plane.PlaneID) (*pla
 		return nil, err
 	}
 
-	return plane.RestorePlane(plane.PlaneSnapshot{
+	return plane_domain.RestorePlane(plane_domain.PlaneSnapshot{
 		ID:   row.ID,
-		Name: plane.Name(row.Name),
+		Name: plane_domain.Name(row.Name),
 	}), nil
 }
 
-func (ths PlaneReader) GetSeatByID(ctx context.Context, id plane.SeatID) (*plane.Seat, error) {
+func (ths PlaneReader) GetSeatByID(ctx context.Context, id plane_domain.SeatID) (*plane_domain.Seat, error) {
 	var row models.SeatRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
 		select * from seats
@@ -39,12 +39,12 @@ func (ths PlaneReader) GetSeatByID(ctx context.Context, id plane.SeatID) (*plane
 		return nil, err
 	}
 
-	return plane.RestoreSeat(plane.SeatSnapshot{
+	return plane_domain.RestoreSeat(plane_domain.SeatSnapshot{
 		ID:      row.ID,
 		Serial:  row.Serial,
 		PlaneID: row.PlaneID,
 		Tag:     row.Tag,
-		Class:   plane.Class(row.Class),
+		Class:   plane_domain.Class(row.Class),
 	}), nil
 }
 

@@ -1,7 +1,7 @@
 package readers
 
 import (
-	"aeroline/src/domain/flight"
+	"aeroline/src/domain/flight_domain"
 	"aeroline/src/domain/shared"
 	"aeroline/src/infra/persistense/models"
 	"context"
@@ -14,7 +14,7 @@ type FlightReader struct {
 	pool *pgxpool.Pool
 }
 
-func (ths FlightReader) GetFlightByID(ctx context.Context, id flight.FlightID) (*flight.Flight, error) {
+func (ths FlightReader) GetFlightByID(ctx context.Context, id flight_domain.FlightID) (*flight_domain.Flight, error) {
 	var row models.FlightRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
 		select * from flights
@@ -24,7 +24,7 @@ func (ths FlightReader) GetFlightByID(ctx context.Context, id flight.FlightID) (
 		return nil, err
 	}
 
-	return flight.RestoreFlight(flight.FlightSnapshot{
+	return flight_domain.RestoreFlight(flight_domain.FlightSnapshot{
 		ID:            row.ID,
 		Departure:     shared.GetAirportByCode(row.DepartureCode),
 		DepartureTime: row.DepartureTime,
@@ -34,7 +34,7 @@ func (ths FlightReader) GetFlightByID(ctx context.Context, id flight.FlightID) (
 	}), nil
 }
 
-func (ths FlightReader) GetFlightSeatByID(ctx context.Context, id flight.FlightSeatID) (*flight.FlightSeat, error) {
+func (ths FlightReader) GetFlightSeatByID(ctx context.Context, id flight_domain.FlightSeatID) (*flight_domain.FlightSeat, error) {
 	var row models.FlightSeatRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
 		select *, (price).* from flight_seats
@@ -44,7 +44,7 @@ func (ths FlightReader) GetFlightSeatByID(ctx context.Context, id flight.FlightS
 		return nil, err
 	}
 
-	return flight.RestoreFlightSeat(flight.FlightSeatSnapshot{
+	return flight_domain.RestoreFlightSeat(flight_domain.FlightSeatSnapshot{
 		ID:         row.ID,
 		Price:      shared.RestorePrice(row.Amount, row.Currency),
 		SeatID:     row.SeatID,

@@ -1,13 +1,13 @@
 package writers
 
 import (
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/user_domain"
 	"context"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func saveUser(ctx context.Context, tx pgx.Tx, user *user.User) error {
+func saveUser(ctx context.Context, tx pgx.Tx, user *user_domain.User) error {
 	spt := user.Snapshot()
 
 	_, err := tx.Exec(ctx, `

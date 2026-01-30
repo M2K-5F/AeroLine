@@ -1,13 +1,13 @@
 package writers
 
 import (
-	"aeroline/src/domain/plane"
+	"aeroline/src/domain/plane_domain"
 	"context"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func savePlane(ctx context.Context, tx pgx.Tx, plane *plane.Plane) error {
+func savePlane(ctx context.Context, tx pgx.Tx, plane *plane_domain.Plane) error {
 	spt := plane.Snapshot()
 
 	_, err := tx.Exec(ctx, `
@@ -28,7 +28,7 @@ func savePlane(ctx context.Context, tx pgx.Tx, plane *plane.Plane) error {
 	return nil
 }
 
-func saveSeat(ctx context.Context, tx pgx.Tx, seat *plane.Seat) error {
+func saveSeat(ctx context.Context, tx pgx.Tx, seat *plane_domain.Seat) error {
 	spt := seat.Snapshot()
 
 	_, err := tx.Exec(ctx, `

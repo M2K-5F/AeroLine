@@ -1,10 +1,10 @@
 package interfaces
 
 import (
-	"aeroline/src/domain/booking"
-	"aeroline/src/domain/flight"
-	"aeroline/src/domain/plane"
-	"aeroline/src/domain/user"
+	"aeroline/src/domain/booking_domain"
+	"aeroline/src/domain/flight_domain"
+	"aeroline/src/domain/plane_domain"
+	"aeroline/src/domain/user_domain"
 	"context"
 )
 
@@ -13,8 +13,8 @@ type IWriter interface {
 }
 
 type ITransactionWriter interface {
-	user.IWriter
-	plane.IWriter
-	flight.IWriter
-	booking.IWriter
+	user_domain.IWriter
+	plane_domain.IWriter
+	flight_domain.IWriter
+	booking_domain.IWriter
 }

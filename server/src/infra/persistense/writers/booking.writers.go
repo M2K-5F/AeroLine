@@ -1,13 +1,13 @@
 package writers
 
 import (
-	"aeroline/src/domain/booking"
+	"aeroline/src/domain/booking_domain"
 	"context"
 
 	"github.com/jackc/pgx/v5"
 )
 
-func saveTicket(ctx context.Context, tx pgx.Tx, ticket *booking.Ticket) error {
+func saveTicket(ctx context.Context, tx pgx.Tx, ticket *booking_domain.Ticket) error {
 	spt := ticket.Snapshot()
 
 	_, err := tx.Exec(ctx, `
