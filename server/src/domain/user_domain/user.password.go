@@ -14,10 +14,9 @@ func NewPassword(plain string) (Password, error) {
 		return "", err
 	}
 
-	hash := string(bytes)
-	return Password(hash), err
+	return Password(bytes), err
 }
 
 func (ths Password) Verify(plain string) bool {
-	return bcrypt.CompareHashAndPassword([]byte(plain), []byte(ths)) == nil
+	return bcrypt.CompareHashAndPassword([]byte(ths), []byte(plain)) == nil
 }

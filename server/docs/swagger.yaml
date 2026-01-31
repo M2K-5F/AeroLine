@@ -1,10 +1,64 @@
 basePath: /api
+definitions:
+  commands.LoginCMD:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  commands.RegisterUserCMD:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  responses.UserResponse:
+    properties:
+      id:
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
 host: localhost:7000
 info:
   contact: {}
   title: Fiber API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/commands.LoginCMD'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserResponse'
+  /auth/register:
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/commands.RegisterUserCMD'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserResponse'
   /health:
     get:
       responses:

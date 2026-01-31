@@ -38,7 +38,13 @@ func RestorePrice(amount int64, currency string) Price {
 	}
 }
 
-const (
-	ErrUnknownCurrency = DomainError("Unknown currency")
-	ErrNegativeAmount  = DomainError("Amount cannot be less than 0")
+var (
+	ErrUnknownCurrency = &AppError{
+		Type: TypeValidation,
+		Msg:  "Unknown currency",
+	}
+	ErrNegativeAmount = &AppError{
+		Type: TypeBusinessLogic,
+		Msg:  "Amount cannot be less than 0",
+	}
 )

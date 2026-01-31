@@ -1,6 +1,7 @@
 package readers
 
 import (
+	"aeroline/src/domain/shared"
 	"aeroline/src/domain/user_domain"
 	"aeroline/src/infra/persistense/models"
 	"context"
@@ -13,7 +14,7 @@ type UserReader struct {
 	pool *pgxpool.Pool
 }
 
-func (ths *UserReader) GetUserByID(ctx context.Context, id user_domain.UserID) (*user_domain.User, error) {
+func (ths UserReader) GetUserByID(ctx context.Context, id user_domain.UserID) (*user_domain.User, error) {
 	var row models.UserRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
 		select * from users 
@@ -34,6 +35,31 @@ func (ths *UserReader) GetUserByID(ctx context.Context, id user_domain.UserID) (
 		Username:     user_domain.Username(row.Username),
 		PasswordHash: user_domain.Password(row.PasswordHash),
 		Permissions:  permissions,
+	}), nil
+}
+
+func (ths UserReader) GetUserByUsername(ctx context.Context, username user_domain.Username) (*user_domain.User, error) {
+	var row models.UserRow
+
+	if err := pgxscan.Get(ctx, ths.pool, &row, `
+		select * from users where 
+		username = $1
+		limit 1;
+		`,
+		username.String(),
+	); err != nil {
+		return nil, err
+	}
+
+	return user_domain.Restore(user_domain.Snapshot{
+		ID:           row.ID,
+		Username:     user_domain.Username(row.Username),
+		PasswordHash: user_domain.Password(row.PasswordHash),
+		Permissions: shared.Map(row.Permissions,
+			func(perm string) user_domain.Permission {
+				return user_domain.Permission(perm)
+			},
+		),
 	}), nil
 }
 

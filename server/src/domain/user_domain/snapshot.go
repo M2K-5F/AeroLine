@@ -18,8 +18,9 @@ func (ths User) Snapshot() Snapshot {
 
 func Restore(spt Snapshot) *User {
 	return &User{
-		id:          spt.ID,
-		username:    spt.Username,
-		permissions: spt.Permissions,
+		id:           spt.ID,
+		username:     spt.Username,
+		permissions:  spt.Permissions,
+		passwordHash: spt.PasswordHash,
 	}
 }

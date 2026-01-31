@@ -1,6 +1,10 @@
 package shared
 
-import "github.com/google/uuid"
+import (
+	"errors"
+
+	"github.com/google/uuid"
+)
 
 type ID uuid.UUID
 
@@ -26,6 +30,6 @@ func NewID() ID {
 	return ID(uuid.New())
 }
 
-const (
-	ErrIDCorrupted = DomainError("INTEGRITY ALERT: corrupted PlaneID in DB")
+var (
+	ErrIDCorrupted = errors.New("INTEGRITY ALERT: corrupted PlaneID in DB")
 )

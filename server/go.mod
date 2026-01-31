@@ -34,7 +34,7 @@ require (
 	github.com/gofiber/fiber/v3 v3.0.0-rc.3 // indirect
 	github.com/gofiber/schema v1.6.0 // indirect
 	github.com/gofiber/swagger/v2 v2.0.0-20251031122725-30bc194ed26e // indirect
-	github.com/gofiber/utils/v2 v2.0.0-rc.6 // indirect
+	github.com/gofiber/utils/v2 v2.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.8.0 // indirect

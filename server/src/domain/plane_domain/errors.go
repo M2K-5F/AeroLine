@@ -1,10 +1,21 @@
 package plane_domain
 
-import "aeroline/src/domain/shared"
+import (
+	"aeroline/src/domain/shared"
+)
 
-const (
-	ErrNameTooShort = shared.DomainError("Plane name too short")
-	ErrNameTooLong  = shared.DomainError("Plane name too long")
+var (
+	ErrNameTooShort = &shared.AppError{
+		Type: shared.TypeValidation,
+		Msg:  "Plane name too short",
+	}
+	ErrNameTooLong = &shared.AppError{
+		Type: shared.TypeValidation,
+		Msg:  "Plane name too long",
+	}
 
-	ErrUnknownSeatClass = shared.DomainError("Unknown seat class")
+	ErrUnknownSeatClass = &shared.AppError{
+		Type: shared.TypeValidation,
+		Msg:  "Unknown seat class",
+	}
 )

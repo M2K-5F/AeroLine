@@ -9,7 +9,7 @@ import (
 
 var validatorSgt = validator.New()
 
-func ValidateAndGetCommand[RequestType any](c fiber.Ctx) (*RequestType, error) {
+func ParseBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
 	var request RequestType
 	if err := c.Bind().Body(&request); err != nil {
 		return nil, err
@@ -20,6 +20,35 @@ func ValidateAndGetCommand[RequestType any](c fiber.Ctx) (*RequestType, error) {
 	}
 
 	return &request, nil
+}
+
+type scannable interface {
+	Scan(value any) error
+}
+
+func ParseIDFromQuery[T any, PT interface {
+	*T
+	scannable
+}](c fiber.Ctx, key string) (PT, error) {
+	value := c.Query(key)
+
+	if value == "" {
+		return nil, fiber.NewError(
+			fiber.StatusUnprocessableEntity,
+			"query parameter '"+key+"' is required",
+		)
+	}
+
+	var id PT = new(T)
+
+	if err := id.Scan(value); err != nil {
+		return nil, fiber.NewError(
+			fiber.StatusUnprocessableEntity,
+			"invalid value for '"+key+"': ",
+		)
+	}
+
+	return id, nil
 }
 
 func GetUserId(c fiber.Ctx) (user_domain.UserID, error) {

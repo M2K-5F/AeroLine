@@ -1,8 +1,8 @@
 package main
 
 import (
-	"aeroline/src/infra/persistense/database"
-	"aeroline/src/infra/persistense/writers"
+	"aeroline/src/infra/restapi/handlers"
+	"aeroline/src/infra/restapi/middlewares"
 	"context"
 	"log"
 	"time"
@@ -14,19 +14,25 @@ import (
 func initApp() (*fiber.App, func(), error) {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	pool, err := database.GetConnectionPoolFromEnv(ctx)
+	deps, err := ResolveDependencies(ctx)
 	if err != nil {
 		cancel()
 		return nil, nil, err
 	}
 
-	_ = writers.NewWriter(pool)
-
 	app := fiber.New()
+
 	app.Get("/docs/*", swagger.HandlerDefault)
+	app.Use(middlewares.Logger())
+	app.Use(middlewares.Error())
 
 	api := app.Group("/api")
-	api.Get("/health", healthCheck)
+	api.Get("/health", handlers.HealthCheck)
+
+	auth := api.Group("/auth")
+
+	auth.Post("/register", deps.AuthController.Register)
+	auth.Post("/login", deps.AuthController.Login)
 
 	cleanup := func() {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -40,11 +46,4 @@ func initApp() (*fiber.App, func(), error) {
 	}
 
 	return app, cleanup, nil
-}
-
-// @Tags health
-// @Success 200 {object} map[string]string "status: ok"
-// @Router /health [get]
-func healthCheck(c fiber.Ctx) error {
-	return c.JSON(fiber.Map{"status": "ok"})
 }
