@@ -22,3 +22,10 @@ type AppError struct {
 func (ths *AppError) Error() string {
 	return string(ths.Type) + ":" + ths.Msg
 }
+
+var (
+	ErrDataNotFound = &AppError{
+		Type: TypeMissingData,
+		Msg:  "Data not found",
+	}
+)

@@ -5,8 +5,10 @@ import (
 	"aeroline/src/domain/shared"
 	"aeroline/src/infra/persistense/models"
 	"context"
+	"errors"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -21,6 +23,9 @@ func (ths FlightReader) GetFlightByID(ctx context.Context, id flight_domain.Flig
 		where id = $1
 		limit 1;
 	`, id.String()); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 
@@ -41,6 +46,9 @@ func (ths FlightReader) GetFlightSeatByID(ctx context.Context, id flight_domain.
 		where id = $1
 		limit 1;
 	`, id.String()); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 

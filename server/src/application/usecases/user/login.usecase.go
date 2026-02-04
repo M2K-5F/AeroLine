@@ -2,8 +2,10 @@ package user_usecase
 
 import (
 	"aeroline/src/application/commands"
+	"aeroline/src/domain/shared"
 	"aeroline/src/domain/user_domain"
 	"context"
+	"errors"
 )
 
 func (ths UseCase) Login(ctx context.Context, cmd commands.LoginCMD) (*user_domain.User, error) {
@@ -13,6 +15,10 @@ func (ths UseCase) Login(ctx context.Context, cmd commands.LoginCMD) (*user_doma
 	}
 
 	usr, err := ths.deps.UserRdr.GetUserByUsername(ctx, username)
+	if errors.Is(err, shared.ErrDataNotFound) {
+		return nil, user_domain.ErrUserWithNameNotFound
+	}
+
 	if err != nil {
 		return nil, err
 	}

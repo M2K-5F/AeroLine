@@ -12,8 +12,10 @@ require (
 	github.com/PuerkitoBio/purell v1.2.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.4.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/georgysavva/scany/v2 v2.1.4 // indirect
 	github.com/go-openapi/jsonpointer v0.22.4 // indirect
@@ -30,11 +32,13 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.1 // indirect
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gofiber/fiber/v2 v2.52.10 // indirect
 	github.com/gofiber/fiber/v3 v3.0.0-rc.3 // indirect
 	github.com/gofiber/schema v1.6.0 // indirect
 	github.com/gofiber/swagger/v2 v2.0.0-20251031122725-30bc194ed26e // indirect
 	github.com/gofiber/utils/v2 v2.0.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/pgx/v5 v5.8.0 // indirect

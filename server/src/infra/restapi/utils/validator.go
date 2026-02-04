@@ -1,6 +1,7 @@
 package rest_utils
 
 import (
+	"aeroline/src/domain/shared"
 	"aeroline/src/domain/user_domain"
 
 	"github.com/go-playground/validator/v10"
@@ -12,11 +13,17 @@ var validatorSgt = validator.New()
 func ParseBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
 	var request RequestType
 	if err := c.Bind().Body(&request); err != nil {
-		return nil, err
+		return nil, &shared.AppError{
+			Type: shared.TypeValidation,
+			Msg:  err.Error(),
+		}
 	}
 
 	if err := validatorSgt.Struct(&request); err != nil {
-		return nil, err
+		return nil, &shared.AppError{
+			Type: shared.TypeValidation,
+			Msg:  err.Error(),
+		}
 	}
 
 	return &request, nil

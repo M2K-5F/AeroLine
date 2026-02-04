@@ -14,6 +14,30 @@ definitions:
       username:
         type: string
     type: object
+  controllers.SessionRequest:
+    properties:
+      deviceID:
+        type: string
+      lastActivity:
+        type: string
+      sessionID:
+        type: string
+      userID:
+        type: string
+    type: object
+  responses.LoginUserResponse:
+    properties:
+      access:
+        type: string
+      id:
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
   responses.UserResponse:
     properties:
       id:
@@ -44,7 +68,27 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.UserResponse'
+            $ref: '#/definitions/responses.LoginUserResponse'
+  /auth/me:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      security:
+      - Bearer: []
+  /auth/refresh:
+    patch:
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
   /auth/register:
     post:
       parameters:
@@ -59,6 +103,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.UserResponse'
+  /auth/sessions:
+    get:
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/controllers.SessionRequest'
+            type: array
+      security:
+      - Bearer: []
   /health:
     get:
       responses:
@@ -70,4 +125,10 @@ paths:
             type: object
       tags:
       - health
+securityDefinitions:
+  Bearer:
+    description: Type "Bearer" followed by a space and then your token.
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

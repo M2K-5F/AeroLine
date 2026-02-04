@@ -20,4 +20,14 @@ var (
 		Type: shared.TypeUnauthorized,
 		Msg:  "Password mismatch",
 	}
+
+	ErrUserMissed = &shared.AppError{
+		Type: shared.TypeMissingData,
+		Msg:  "User data missed in persistense",
+	}
+
+	ErrUserWithNameNotFound = &shared.AppError{
+		Type: shared.TypeNotFound,
+		Msg:  "User with this username not founded",
+	}
 )

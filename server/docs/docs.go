@@ -32,7 +32,44 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.UserResponse"
+                            "$ref": "#/definitions/responses.LoginUserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/refresh": {
+            "patch": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -56,6 +93,26 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/responses.UserResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/sessions": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/controllers.SessionRequest"
+                            }
                         }
                     }
                 }
@@ -103,6 +160,43 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.SessionRequest": {
+            "type": "object",
+            "properties": {
+                "deviceID": {
+                    "type": "string"
+                },
+                "lastActivity": {
+                    "type": "string"
+                },
+                "sessionID": {
+                    "type": "string"
+                },
+                "userID": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.LoginUserResponse": {
+            "type": "object",
+            "properties": {
+                "access": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "responses.UserResponse": {
             "type": "object",
             "properties": {
@@ -119,6 +213,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "description": "Type \"Bearer\" followed by a space and then your token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

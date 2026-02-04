@@ -5,8 +5,10 @@ import (
 	"aeroline/src/domain/user_domain"
 	"aeroline/src/infra/persistense/models"
 	"context"
+	"errors"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -22,19 +24,21 @@ func (ths UserReader) GetUserByID(ctx context.Context, id user_domain.UserID) (*
 		limit 1;
 	`, id.String(),
 	); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
-	}
-
-	permissions := make([]user_domain.Permission, len(row.Permissions))
-	for i, permission := range row.Permissions {
-		permissions[i] = user_domain.Permission(permission)
 	}
 
 	return user_domain.Restore(user_domain.Snapshot{
 		ID:           row.ID,
 		Username:     user_domain.Username(row.Username),
 		PasswordHash: user_domain.Password(row.PasswordHash),
-		Permissions:  permissions,
+		Permissions: shared.Map(row.Permissions,
+			func(p string) user_domain.Permission {
+				return user_domain.Permission(p)
+			},
+		),
 	}), nil
 }
 
@@ -48,6 +52,9 @@ func (ths UserReader) GetUserByUsername(ctx context.Context, username user_domai
 		`,
 		username.String(),
 	); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 

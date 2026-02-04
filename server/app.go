@@ -1,6 +1,8 @@
 package main
 
 import (
+	"aeroline/src/domain/user_domain"
+	rest_auth "aeroline/src/infra/restapi/auth"
 	"aeroline/src/infra/restapi/handlers"
 	"aeroline/src/infra/restapi/middlewares"
 	"context"
@@ -27,12 +29,22 @@ func initApp() (*fiber.App, func(), error) {
 	app.Use(middlewares.Error())
 
 	api := app.Group("/api")
+	api.Use(rest_auth.DeviceIDMiddleware)
 	api.Get("/health", handlers.HealthCheck)
 
 	auth := api.Group("/auth")
 
 	auth.Post("/register", deps.AuthController.Register)
 	auth.Post("/login", deps.AuthController.Login)
+	auth.Get("/me",
+		deps.Filter(
+			user_domain.AdminPermission,
+			user_domain.CustomerPermission,
+		),
+		deps.AuthController.Me,
+	)
+	auth.Patch("/refresh", deps.AuthController.Refresh)
+	auth.Get("/sessions", deps.Filter(), deps.AuthController.GetSessions)
 
 	cleanup := func() {
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)

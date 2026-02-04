@@ -1,7 +1,11 @@
 {
   "watch": ["**/*.go"],
+  "quiet": true,
   "ignore": ["**/testdata/**", "tmp/", "docs/", "vendor/"],
   "ext": "go",
   "exec": "cmd/dev.bat",
-  "legacyWatch": true
+  "legacyWatch": true,
+  "events": {
+    "restart": "cls"
+  }
 }

@@ -5,8 +5,10 @@ import (
 	"aeroline/src/domain/shared"
 	"aeroline/src/infra/persistense/models"
 	"context"
+	"errors"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -21,6 +23,9 @@ func (ths BookingReader) GetTicketByID(ctx context.Context, id booking_domain.Ti
 		select *, (price).* from tickets where id = $1;
 	`, id.String(),
 	); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 

@@ -22,3 +22,8 @@ func UserToResponse(usr user_domain.User) UserResponse {
 		),
 	}
 }
+
+type LoginUserResponse struct {
+	UserResponse
+	Access string
+}

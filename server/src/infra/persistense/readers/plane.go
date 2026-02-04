@@ -2,10 +2,13 @@ package readers
 
 import (
 	"aeroline/src/domain/plane_domain"
+	"aeroline/src/domain/shared"
 	"aeroline/src/infra/persistense/models"
 	"context"
+	"errors"
 
 	"github.com/georgysavva/scany/v2/pgxscan"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,10 +19,14 @@ type PlaneReader struct {
 func (ths PlaneReader) GetPlaneByID(ctx context.Context, id plane_domain.PlaneID) (*plane_domain.Plane, error) {
 	var row models.PlaneRow
 	if err := pgxscan.Get(ctx, ths.pool, &row, `
-		select * from planes 
-		where id = $1
-		limit 1;
-	`, id.String()); err != nil {
+			select * from planes 
+			where id = $1
+			limit 1;
+		`, id.String(),
+	); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 
@@ -36,6 +43,9 @@ func (ths PlaneReader) GetSeatByID(ctx context.Context, id plane_domain.SeatID) 
 		where id = $1
 		limit 1;
 	`, id.String()); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, shared.ErrDataNotFound
+		}
 		return nil, err
 	}
 

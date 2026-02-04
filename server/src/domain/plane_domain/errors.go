@@ -18,4 +18,14 @@ var (
 		Type: shared.TypeValidation,
 		Msg:  "Unknown seat class",
 	}
+
+	ErrPlaneMissed = &shared.AppError{
+		Type: shared.TypeMissingData,
+		Msg:  "Plane data missed in persistense",
+	}
+
+	ErrSeatMissed = &shared.AppError{
+		Type: shared.TypeMissingData,
+		Msg:  "Seat data missed in persistense",
+	}
 )

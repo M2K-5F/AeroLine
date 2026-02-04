@@ -19,6 +19,10 @@ import (
 // @version 1.0
 // @host localhost:7000
 // @BasePath /api
+// @securityDefinitions.apikey Bearer
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and then your token.
 func main() {
 	app, cleanup, err := initApp()
 	if err != nil {
@@ -39,7 +43,7 @@ func main() {
 	select {
 	case <-sigChan:
 		cleanup()
-		log.Println("Server stopped gracefully")
+		log.Printf("\n\t%sServer stopped gracefully%s", "\033[1;32m", "\033[0m")
 
 	case err := <-errChan:
 		log.Printf("Server error: %v", err)
