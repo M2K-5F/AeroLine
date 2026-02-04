@@ -23,13 +23,11 @@ type UserRdr interface {
 }
 
 type IAuthStorage interface {
-	GetTokenBySessionID(ctx context.Context, sessionID SessionID) (RefreshToken, error)
-
-	SaveToken(ctx context.Context, token RefreshToken, sessionID SessionID) error
-
 	SaveSession(ctx context.Context, session Session) error
 
 	GetSessionByID(ctx context.Context, sessionID SessionID) (*Session, error)
 
 	GetUserSessions(ctx context.Context, userID user_domain.UserID) ([]Session, error)
+
+	DeleteSession(ctx context.Context, userID user_domain.UserID, sessionID SessionID) error
 }

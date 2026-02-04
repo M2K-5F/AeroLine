@@ -8,7 +8,9 @@ import (
 	rest_auth "aeroline/src/infra/restapi/auth"
 	"aeroline/src/infra/restapi/controllers"
 	"context"
+	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -20,6 +22,7 @@ type Filters struct {
 type Dependencies struct {
 	AuthController *controllers.AuthController
 	Filter         rest_auth.PermissionFilter
+	Close          func()
 }
 
 func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
@@ -28,6 +31,12 @@ func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
 		return nil, err
 	}
 
+	dsn := os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT")
+	client := redis.NewClient(&redis.Options{
+		Addr: dsn,
+		DB:   0,
+	})
+
 	writer := writers.NewWriter(pool)
 
 	userReader := readers.NewUserReader(pool)
@@ -35,7 +44,7 @@ func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
 	// flightReader := readers.NewFlightReader(pool)
 	// bookingReader := readers.NewBookingReader(pool)
 
-	tokenService := rest_auth.NewAuthService(rest_auth.NewConfigFromEnv(), userReader)
+	tokenService := rest_auth.NewAuthService(client, rest_auth.NewConfigFromEnv(), userReader)
 
 	filter := rest_auth.NewPermissionFilter(*tokenService)
 
@@ -49,5 +58,9 @@ func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
 	return &Dependencies{
 		AuthController: authCtrlr,
 		Filter:         filter,
+		Close: func() {
+			pool.Close()
+			client.Close()
+		},
 	}, nil
 }

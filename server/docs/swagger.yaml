@@ -14,17 +14,6 @@ definitions:
       username:
         type: string
     type: object
-  controllers.SessionRequest:
-    properties:
-      deviceID:
-        type: string
-      lastActivity:
-        type: string
-      sessionID:
-        type: string
-      userID:
-        type: string
-    type: object
   responses.LoginUserResponse:
     properties:
       access:
@@ -47,6 +36,27 @@ definitions:
           type: string
         type: array
       username:
+        type: string
+    type: object
+  rest_auth.SessionResponse:
+    properties:
+      browser:
+        type: string
+      device_id:
+        type: string
+      ip:
+        type: string
+      is_blocked:
+        type: boolean
+      last_activity:
+        type: string
+      os:
+        type: string
+      session_id:
+        type: string
+      user_agent:
+        type: string
+      user_id:
         type: string
     type: object
 host: localhost:7000
@@ -110,7 +120,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/controllers.SessionRequest'
+              $ref: '#/definitions/rest_auth.SessionResponse'
             type: array
       security:
       - Bearer: []

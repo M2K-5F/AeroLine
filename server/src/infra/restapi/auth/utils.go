@@ -22,3 +22,22 @@ func GetDeviceID(c fiber.Ctx) *DeviceID {
 	}
 	return o
 }
+
+func GetDevice(c fiber.Ctx) *Device {
+	device, ok := c.Locals("deviceMeta").(*Device)
+	if !ok {
+		panic("You need add device id middleware to use device in controllers")
+	}
+
+	return device
+}
+
+func GetRefreshToken(c fiber.Ctx) (*RefreshToken, error) {
+	plain := c.Cookies("refr")
+	if plain == "" {
+		return nil, ErrTokenNotFound
+	}
+	token := RefreshToken(plain)
+
+	return &token, nil
+}

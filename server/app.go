@@ -47,6 +47,7 @@ func initApp() (*fiber.App, func(), error) {
 	auth.Get("/sessions", deps.Filter(), deps.AuthController.GetSessions)
 
 	cleanup := func() {
+		deps.Close()
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer shutdownCancel()
 

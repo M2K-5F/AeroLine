@@ -111,7 +111,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/controllers.SessionRequest"
+                                "$ref": "#/definitions/rest_auth.SessionResponse"
                             }
                         }
                     }
@@ -160,23 +160,6 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.SessionRequest": {
-            "type": "object",
-            "properties": {
-                "deviceID": {
-                    "type": "string"
-                },
-                "lastActivity": {
-                    "type": "string"
-                },
-                "sessionID": {
-                    "type": "string"
-                },
-                "userID": {
-                    "type": "string"
-                }
-            }
-        },
         "responses.LoginUserResponse": {
             "type": "object",
             "properties": {
@@ -210,6 +193,38 @@ const docTemplate = `{
                     }
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "rest_auth.SessionResponse": {
+            "type": "object",
+            "properties": {
+                "browser": {
+                    "type": "string"
+                },
+                "device_id": {
+                    "type": "string"
+                },
+                "ip": {
+                    "type": "string"
+                },
+                "is_blocked": {
+                    "type": "boolean"
+                },
+                "last_activity": {
+                    "type": "string"
+                },
+                "os": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "user_agent": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }

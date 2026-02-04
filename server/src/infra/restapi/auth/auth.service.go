@@ -8,7 +8,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -17,160 +19,33 @@ type AuthService struct {
 	config  Config
 }
 
-func (ths AuthService) Login(ctx context.Context, user *user_domain.User, deviceID DeviceID) (AccessToken, RefreshToken, error) {
-	session := NewSession(user.ID(), deviceID)
-
-	now := time.Now()
-
-	accessPlain, err := jwt.NewWithClaims(
+func (ths AuthService) signAccessToken(claims AccessTokenClaims) (*AccessToken, error) {
+	plain, err := jwt.NewWithClaims(
 		jwt.SigningMethodES256,
-		AccessTokenClaims{
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   user.ID().String(),
-				IssuedAt:  jwt.NewNumericDate(now),
-				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.AccessTokenTTl)),
-			},
-			Permissions: shared.Map(user.Permissions(),
-				func(p user_domain.Permission) string {
-					return p.String()
-				},
-			),
-		},
+		claims,
 	).SignedString(ths.config.privateKey)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	refreshPlain, err := jwt.NewWithClaims(
-		jwt.SigningMethodES256,
-		RefreshTokenClaims{
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   user.ID().String(),
-				IssuedAt:  jwt.NewNumericDate(now),
-				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.SessionTTL)),
-			},
-			SessionID: session.SessionID,
-		},
-	).SignedString(ths.config.privateKey)
-	if err != nil {
-		return "", "", err
-	}
-
-	accessToken := AccessToken(accessPlain)
-	refreshToken := RefreshToken(refreshPlain)
-
-	err = ths.storage.SaveToken(ctx, refreshToken, session.SessionID)
-	if err != nil {
-		return "", "", err
-	}
-
-	err = ths.storage.SaveSession(ctx, *session)
-	if err != nil {
-		return "", "", err
-	}
-
-	return accessToken, refreshToken, nil
+	token := AccessToken(plain)
+	return &token, nil
 }
 
-func (ths AuthService) RefreshToken(ctx context.Context, token RefreshToken, deviceID DeviceID) (AccessToken, RefreshToken, error) {
-	var claims *RefreshTokenClaims
-
-	if token, err := jwt.ParseWithClaims(
-		string(token),
-		&RefreshTokenClaims{},
-		func(t *jwt.Token) (any, error) { return ths.config.publicKey, nil },
-	); err != nil {
-		return "", "", err
-	} else {
-		claims = token.Claims.(*RefreshTokenClaims)
-	}
-
-	var userID user_domain.UserID
-	userID.Scan(claims.Subject)
-
-	cachedToken, err := ths.storage.GetTokenBySessionID(ctx, claims.SessionID)
-	if err != nil {
-		return "", "", err
-	}
-
-	if cachedToken != token {
-		return "", "", ErrRefreshTokenInvalid
-	}
-
-	session, err := ths.storage.GetSessionByID(ctx, claims.SessionID)
-	if err != nil {
-		return "", "", err
-	}
-
-	if session.DeviceID != deviceID {
-		return "", "", ErrUndefinedDevice
-	}
-
-	if session.IsBlocked {
-		return "", "", ErrSessionBlocked
-	}
-
-	now := time.Now()
-
-	refreshPlain, err := jwt.NewWithClaims(
+func (ths AuthService) signRefreshToken(claims RefreshTokenClaims) (*RefreshToken, error) {
+	plain, err := jwt.NewWithClaims(
 		jwt.SigningMethodES256,
-		RefreshTokenClaims{
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   userID.String(),
-				IssuedAt:  jwt.NewNumericDate(now),
-				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.SessionTTL)),
-			},
-			SessionID: session.SessionID,
-		},
+		claims,
 	).SignedString(ths.config.privateKey)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
 
-	refreshToken := RefreshToken(refreshPlain)
-
-	err = ths.storage.SaveToken(ctx, refreshToken, session.SessionID)
-	if err != nil {
-		return "", "", err
-	}
-
-	session.LastActivity = time.Now()
-
-	err = ths.storage.SaveSession(ctx, *session)
-	if err != nil {
-		return "", "", err
-	}
-
-	user, err := ths.userRdr.GetUserByID(ctx, userID)
-	if err != nil {
-		return "", "", err
-	}
-
-	accessPlain, err := jwt.NewWithClaims(
-		jwt.SigningMethodES256,
-		AccessTokenClaims{
-			RegisteredClaims: jwt.RegisteredClaims{
-				Subject:   user.ID().String(),
-				IssuedAt:  jwt.NewNumericDate(now),
-				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.AccessTokenTTl)),
-			},
-			Permissions: shared.Map(user.Permissions(),
-				func(p user_domain.Permission) string {
-					return p.String()
-				},
-			),
-		},
-	).SignedString(ths.config.privateKey)
-	if err != nil {
-		return "", "", err
-	}
-
-	accessToken := AccessToken(accessPlain)
-
-	return accessToken, refreshToken, nil
+	token := RefreshToken(plain)
+	return &token, nil
 }
 
-func (ths AuthService) VerifyAccessToken(ctx context.Context, token AccessToken) (*user_domain.UserID, *[]user_domain.Permission, error) {
+func (ths AuthService) verifyAccessToken(token AccessToken) (*AccessTokenClaims, error) {
 	var claims *AccessTokenClaims
 
 	if token, err := jwt.ParseWithClaims(
@@ -179,11 +54,160 @@ func (ths AuthService) VerifyAccessToken(ctx context.Context, token AccessToken)
 		func(t *jwt.Token) (any, error) { return ths.config.publicKey, nil },
 	); err != nil {
 		if errors.Is(err, jwt.ErrTokenExpired) {
-			return nil, nil, ErrTokenExpired
+			return nil, ErrTokenExpired
 		}
-		return nil, nil, err
+		return nil, err
 	} else {
 		claims = token.Claims.(*AccessTokenClaims)
+	}
+
+	return claims, nil
+}
+
+func (ths AuthService) verifyRefreshToken(token RefreshToken) (*RefreshTokenClaims, error) {
+	var claims *RefreshTokenClaims
+
+	if token, err := jwt.ParseWithClaims(
+		string(token),
+		&RefreshTokenClaims{},
+		func(t *jwt.Token) (any, error) { return ths.config.publicKey, nil },
+	); err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return nil, ErrTokenExpired
+		}
+		return nil, err
+	} else {
+		claims = token.Claims.(*RefreshTokenClaims)
+	}
+
+	return claims, nil
+}
+
+func (ths AuthService) Login(ctx context.Context, user *user_domain.User, device *Device) (*AccessToken, *RefreshToken, error) {
+	session := NewSession(user.ID(), device)
+
+	now := time.Now()
+
+	accessToken, err := ths.signAccessToken(
+		AccessTokenClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Subject:   user.ID().String(),
+				IssuedAt:  jwt.NewNumericDate(now),
+				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.AccessTokenTTl)),
+			},
+			Permissions: shared.Map(user.Permissions(),
+				func(p user_domain.Permission) string {
+					return p.String()
+				},
+			),
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	refreshToken, err := ths.signRefreshToken(
+		RefreshTokenClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Subject:   user.ID().String(),
+				IssuedAt:  jwt.NewNumericDate(now),
+				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.SessionTTL)),
+			},
+			SessionID: session.SessionID.String(),
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	session.UpdateToken(refreshToken)
+
+	if err := ths.storage.SaveSession(ctx, *session); err != nil {
+		return nil, nil, err
+	}
+
+	return accessToken, refreshToken, nil
+}
+
+func (ths AuthService) RefreshToken(ctx context.Context, token RefreshToken, device *Device) (*AccessToken, *RefreshToken, error) {
+	refreshClaims, err := ths.verifyRefreshToken(token)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	session, err := ths.storage.GetSessionByID(ctx, SessionID(uuid.MustParse(refreshClaims.SessionID)))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	cachedToken := session.CurrentRefreshToken
+
+	if cachedToken != token {
+		return nil, nil, ErrRefreshTokenInvalid
+	}
+
+	if device.DeviceID != session.Device.DeviceID {
+		return nil, nil, ErrUndefinedDevice
+	}
+
+	if session.IsBlocked {
+		return nil, nil, ErrSessionBlocked
+	}
+
+	now := time.Now()
+
+	refreshToken, err := ths.signRefreshToken(
+		RefreshTokenClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Subject:   session.UserID.String(),
+				IssuedAt:  jwt.NewNumericDate(now),
+				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.SessionTTL)),
+			},
+			SessionID: session.SessionID.String(),
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	session.UpdateActivity()
+	session.UpdateToken(refreshToken)
+
+	user, err := ths.userRdr.GetUserByID(ctx, session.UserID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = ths.storage.SaveSession(ctx, *session)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	accessToken, err := ths.signAccessToken(
+		AccessTokenClaims{
+			RegisteredClaims: jwt.RegisteredClaims{
+				Subject:   user.ID().String(),
+				IssuedAt:  jwt.NewNumericDate(now),
+				ExpiresAt: jwt.NewNumericDate(now.Add(ths.config.AccessTokenTTl)),
+			},
+			Permissions: shared.Map(user.Permissions(),
+				func(p user_domain.Permission) string {
+					return p.String()
+				},
+			),
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return accessToken, refreshToken, nil
+}
+
+func (ths AuthService) VerifyAccessToken(ctx context.Context, token AccessToken) (*user_domain.UserID, *[]user_domain.Permission, error) {
+	claims, err := ths.verifyAccessToken(token)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	var userID user_domain.UserID
@@ -200,11 +224,11 @@ func (ths AuthService) GetUserSessions(ctx context.Context, userID user_domain.U
 	return ths.storage.GetUserSessions(ctx, userID)
 }
 
-func NewAuthService(config Config, userRdr UserRdr) *AuthService {
+func NewAuthService(redisClient *redis.Client, config Config, userRdr UserRdr) *AuthService {
 	return &AuthService{
 		config:  config,
 		userRdr: userRdr,
-		storage: NewAuthStorage(config),
+		storage: NewAuthStorage(config, redisClient),
 	}
 }
 
