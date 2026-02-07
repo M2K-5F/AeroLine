@@ -7,5 +7,5 @@ type IReader interface {
 }
 
 type IWriter interface {
-	SaveTicket(*Ticket) error
+	SaveTicket(*Ticket, ...*Ticket) error
 }

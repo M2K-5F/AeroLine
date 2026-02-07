@@ -18,7 +18,6 @@ import (
 // @title Fiber API
 // @version 1.0
 // @host localhost:7000
-// @BasePath /api
 // @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization

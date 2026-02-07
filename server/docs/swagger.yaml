@@ -1,17 +1,30 @@
-basePath: /api
 definitions:
-  commands.LoginCMD:
+  controllers.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+  controllers.LogoutResponse:
+    properties:
+      message:
+        example: Successful logout
+        type: string
+    type: object
+  requests.RegisterUserRequest:
     properties:
       password:
         type: string
       username:
         type: string
     type: object
-  commands.RegisterUserCMD:
+  responses.CityResponse:
     properties:
-      password:
+      code:
         type: string
-      username:
+      country:
+        type: string
+      name:
         type: string
     type: object
   responses.LoginUserResponse:
@@ -59,6 +72,13 @@ definitions:
       user_id:
         type: string
     type: object
+  user_usecase.LoginCMD:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:7000
 info:
   contact: {}
@@ -73,21 +93,36 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/commands.LoginCMD'
+          $ref: '#/definitions/user_usecase.LoginCMD'
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/responses.LoginUserResponse'
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.LogoutResponse'
+      security:
+      - Bearer: []
+      tags:
+      - auth
   /auth/me:
     get:
       responses:
         "200":
           description: OK
           schema:
-            type: string
+            $ref: '#/definitions/responses.UserResponse'
       security:
       - Bearer: []
+      tags:
+      - auth
   /auth/refresh:
     patch:
       responses:
@@ -99,6 +134,8 @@ paths:
             type: object
       security:
       - Bearer: []
+      tags:
+      - auth
   /auth/register:
     post:
       parameters:
@@ -107,12 +144,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/commands.RegisterUserCMD'
+          $ref: '#/definitions/requests.RegisterUserRequest'
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/responses.UserResponse'
+      tags:
+      - auth
   /auth/sessions:
     get:
       responses:
@@ -124,17 +163,49 @@ paths:
             type: array
       security:
       - Bearer: []
+      tags:
+      - auth
+  /flight/cities:
+    get:
+      parameters:
+      - description: name of city
+        in: query
+        name: q
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/responses.CityResponse'
+            type: array
   /health:
     get:
       responses:
         "200":
-          description: 'status: ok'
+          description: OK
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/controllers.HealthResponse'
       tags:
       - health
+  /users/{id}:
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.UserResponse'
+      security:
+      - Bearer: []
+      tags:
+      - users
 securityDefinitions:
   Bearer:
     description: Type "Bearer" followed by a space and then your token.

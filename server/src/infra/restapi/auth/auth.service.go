@@ -249,7 +249,7 @@ func NewConfigFromEnv() Config {
 	return Config{
 		publicKey:      publicKey,
 		privateKey:     privateKey,
-		AccessTokenTTl: 10 * time.Minute,
+		AccessTokenTTl: 120 * time.Minute,
 		SessionTTL:     7 * 24 * time.Hour,
 	}
 }

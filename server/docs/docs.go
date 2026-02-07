@@ -17,6 +17,9 @@ const docTemplate = `{
     "paths": {
         "/auth/login": {
             "post": {
+                "tags": [
+                    "auth"
+                ],
                 "parameters": [
                     {
                         "description": "body",
@@ -24,7 +27,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/commands.LoginCMD"
+                            "$ref": "#/definitions/user_usecase.LoginCMD"
                         }
                     }
                 ],
@@ -38,6 +41,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.LogoutResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/me": {
             "get": {
                 "security": [
@@ -45,11 +68,14 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/responses.UserResponse"
                         }
                     }
                 }
@@ -61,6 +87,9 @@ const docTemplate = `{
                     {
                         "Bearer": []
                     }
+                ],
+                "tags": [
+                    "auth"
                 ],
                 "responses": {
                     "200": {
@@ -77,6 +106,9 @@ const docTemplate = `{
         },
         "/auth/register": {
             "post": {
+                "tags": [
+                    "auth"
+                ],
                 "parameters": [
                     {
                         "description": "body",
@@ -84,7 +116,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/commands.RegisterUserCMD"
+                            "$ref": "#/definitions/requests.RegisterUserRequest"
                         }
                     }
                 ],
@@ -105,6 +137,9 @@ const docTemplate = `{
                         "Bearer": []
                     }
                 ],
+                "tags": [
+                    "auth"
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -118,6 +153,30 @@ const docTemplate = `{
                 }
             }
         },
+        "/flight/cities": {
+            "get": {
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "name of city",
+                        "name": "q",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/responses.CityResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/health": {
             "get": {
                 "tags": [
@@ -125,12 +184,38 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "status: ok",
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/controllers.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "tags": [
+                    "users"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.UserResponse"
                         }
                     }
                 }
@@ -138,7 +223,25 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "commands.LoginCMD": {
+        "controllers.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "ok"
+                }
+            }
+        },
+        "controllers.LogoutResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Successful logout"
+                }
+            }
+        },
+        "requests.RegisterUserRequest": {
             "type": "object",
             "properties": {
                 "password": {
@@ -149,13 +252,16 @@ const docTemplate = `{
                 }
             }
         },
-        "commands.RegisterUserCMD": {
+        "responses.CityResponse": {
             "type": "object",
             "properties": {
-                "password": {
+                "code": {
                     "type": "string"
                 },
-                "username": {
+                "country": {
+                    "type": "string"
+                },
+                "name": {
                     "type": "string"
                 }
             }
@@ -228,6 +334,17 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "user_usecase.LoginCMD": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
         }
     },
     "securityDefinitions": {
@@ -244,7 +361,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:7000",
-	BasePath:         "/api",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Fiber API",
 	Description:      "",

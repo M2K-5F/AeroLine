@@ -8,5 +8,5 @@ type IReader interface {
 }
 
 type IWriter interface {
-	SaveUser(*User) error
+	SaveUser(*User, ...*User) error
 }

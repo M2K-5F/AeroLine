@@ -1,13 +1,17 @@
 package user_usecase
 
 import (
-	"aeroline/src/application/commands"
 	"aeroline/src/application/interfaces"
 	"aeroline/src/domain/user_domain"
 	"context"
 )
 
-func (ths UseCase) Register(ctx context.Context, cmd commands.RegisterUserCMD) (*user_domain.User, error) {
+type RegisterUserCMD struct {
+	Username user_domain.Username
+	Password string
+}
+
+func (ths UseCase) Register(ctx context.Context, cmd RegisterUserCMD) (*user_domain.User, error) {
 	user, err := user_domain.NewUser(cmd.Username, cmd.Password)
 	if err != nil {
 		return nil, err

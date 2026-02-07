@@ -1,22 +1,21 @@
 package user_usecase
 
 import (
-	"aeroline/src/application/commands"
 	"aeroline/src/domain/shared"
-	"aeroline/src/domain/user_domain"
+	domain "aeroline/src/domain/user_domain"
 	"context"
 	"errors"
 )
 
-func (ths UseCase) Login(ctx context.Context, cmd commands.LoginCMD) (*user_domain.User, error) {
-	username, err := user_domain.NewUsername(cmd.Username)
-	if err != nil {
-		return nil, err
-	}
+type LoginCMD struct {
+	Username domain.Username
+	Password string
+}
 
-	usr, err := ths.deps.UserRdr.GetUserByUsername(ctx, username)
+func (ths UseCase) Login(ctx context.Context, cmd LoginCMD) (*domain.User, error) {
+	usr, err := ths.deps.UserRdr.GetUserByUsername(ctx, cmd.Username)
 	if errors.Is(err, shared.ErrDataNotFound) {
-		return nil, user_domain.ErrUserWithNameNotFound
+		return nil, domain.ErrUserWithNameNotFound
 	}
 
 	if err != nil {
@@ -24,7 +23,7 @@ func (ths UseCase) Login(ctx context.Context, cmd commands.LoginCMD) (*user_doma
 	}
 
 	if !usr.VerifyPassword(cmd.Password) {
-		return nil, user_domain.ErrPasswordMismath
+		return nil, domain.ErrPasswordMismath
 	}
 
 	return usr, nil

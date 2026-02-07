@@ -3,7 +3,6 @@ package rest_auth
 import (
 	"aeroline/src/domain/user_domain"
 	"slices"
-	"strings"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -64,11 +63,11 @@ func getBearerFromInLocals(c fiber.Ctx) (string, error) {
 
 	authHeader := authHeaders[0]
 
-	words := strings.Split(strings.TrimSpace(authHeader), " ")
-	if len(words) != 2 || strings.ToLower(words[0]) != "bearer" {
-		return "", ErrInvalidTokenFormat
-	}
+	// words := strings.Split(strings.TrimSpace(authHeader), " ")
+	// if len(words) != 2 || strings.ToLower(words[0]) != "bearer" {
+	// 	return "", ErrInvalidTokenFormat
+	// }
 
-	return words[1], nil
-
+	// return words[1], nil
+	return authHeader, nil
 }

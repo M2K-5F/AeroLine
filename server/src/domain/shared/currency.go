@@ -18,3 +18,7 @@ func (ths Currency) IsValid() bool {
 	_, ok := validCurrencies[ths]
 	return ok
 }
+
+func (ths Currency) String() string {
+	return string(ths)
+}

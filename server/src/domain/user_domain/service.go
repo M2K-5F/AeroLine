@@ -1,10 +1,6 @@
 package user_domain
 
-func NewUser(username string, password string) (*User, error) {
-	usernameVO, err := NewUsername(username)
-	if err != nil {
-		return nil, err
-	}
+func NewUser(usernameVO Username, password string) (*User, error) {
 
 	passwordVO, err := NewPassword(password)
 	if err != nil {

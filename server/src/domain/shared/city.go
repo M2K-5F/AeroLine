@@ -59,3 +59,36 @@ var (
 	Vienna          = City{Code: "VIE", Name: "Вена", Country: Austria}
 	Zurich          = City{Code: "ZRH", Name: "Цюрих", Country: Switzerland}
 )
+
+var CityList = []City{
+	Moscow,
+	SaintPetersburg,
+	Istanbul,
+	Dubai,
+	Bangkok,
+	Antalya,
+	Yerevan,
+	Tbilisi,
+	Almaty,
+	Bishkek,
+	Simferopol,
+	Sochi,
+	Krasnodar,
+	RostovOnDon,
+	Yekaterinburg,
+	Kazan,
+	Ufa,
+	NizhnyNovgorod,
+	Kaliningrad,
+	Novosibirsk,
+	Paris,
+	Frankfurt,
+	London,
+	NewYork,
+	Phuket,
+	Male,
+	Hannover,
+	Prague,
+	Vienna,
+	Zurich,
+}

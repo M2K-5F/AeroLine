@@ -6,9 +6,9 @@ import (
 )
 
 type UserResponse struct {
-	ID          string
-	Username    string
-	Permissions []string
+	ID          string   `json:"id"`
+	Username    string   `json:"username"`
+	Permissions []string `json:"permissions"`
 }
 
 func UserToResponse(usr user_domain.User) UserResponse {
@@ -25,5 +25,5 @@ func UserToResponse(usr user_domain.User) UserResponse {
 
 type LoginUserResponse struct {
 	UserResponse
-	Access string
+	Access string `json:"access"`
 }

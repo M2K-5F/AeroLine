@@ -2,7 +2,6 @@ package rest_utils
 
 import (
 	"aeroline/src/domain/shared"
-	"aeroline/src/domain/user_domain"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -10,9 +9,34 @@ import (
 
 var validatorSgt = validator.New()
 
-func ParseBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
-	var request RequestType
-	if err := c.Bind().Body(&request); err != nil {
+// func ParseBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
+// 	var request RequestType
+// 	if err := c.Bind().Body(&request); err != nil {
+// 		return nil, &shared.AppError{
+// 			Type: shared.TypeValidation,
+// 			Msg:  err.Error(),
+// 		}
+// 	}
+
+// 	if err := validatorSgt.Struct(&request); err != nil {
+// 		return nil, &shared.AppError{
+// 			Type: shared.TypeValidation,
+// 			Msg:  err.Error(),
+// 		}
+// 	}
+
+// 	return &request, nil
+// }
+
+type cmd interface{}
+
+type request[c cmd] interface {
+	ToCMD() (*c, error)
+}
+
+func ParseCommand[R request[C], C cmd](c fiber.Ctx) (*C, error) {
+	var request R
+	if err := c.Bind().All(&request); err != nil {
 		return nil, &shared.AppError{
 			Type: shared.TypeValidation,
 			Msg:  err.Error(),
@@ -26,7 +50,7 @@ func ParseBody[RequestType any](c fiber.Ctx) (*RequestType, error) {
 		}
 	}
 
-	return &request, nil
+	return request.ToCMD()
 }
 
 type scannable interface {
@@ -56,15 +80,4 @@ func ParseIDFromQuery[T any, PT interface {
 	}
 
 	return id, nil
-}
-
-func GetUserId(c fiber.Ctx) (user_domain.UserID, error) {
-	plainID := c.Locals("X-userID").(string)
-	var userID user_domain.UserID
-	err := userID.Scan(plainID)
-	if err != nil {
-		return user_domain.UserID{}, err
-	}
-
-	return userID, nil
 }

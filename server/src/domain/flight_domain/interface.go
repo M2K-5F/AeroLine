@@ -8,6 +8,6 @@ type IReader interface {
 }
 
 type IWriter interface {
-	SaveFlight(*Flight) error
-	SaveFlightSeat(*FlightSeat) error
+	SaveFlight(*Flight, ...*Flight) error
+	SaveFlightSeat(*FlightSeat, ...*FlightSeat) error
 }

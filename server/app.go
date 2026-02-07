@@ -3,7 +3,6 @@ package main
 import (
 	"aeroline/src/domain/user_domain"
 	rest_auth "aeroline/src/infra/restapi/auth"
-	"aeroline/src/infra/restapi/handlers"
 	"aeroline/src/infra/restapi/middlewares"
 	"context"
 	"log"
@@ -21,34 +20,37 @@ func initApp() (*fiber.App, func(), error) {
 		cancel()
 		return nil, nil, err
 	}
+	filter := deps.Filter
 
 	app := fiber.New()
 
-	app.Get("/docs/*", swagger.HandlerDefault)
 	app.Use(middlewares.Logger())
 	app.Use(middlewares.Error())
+	app.Use(rest_auth.DeviceIDMiddleware)
 
-	api := app.Group("/api")
-	api.Use(rest_auth.DeviceIDMiddleware)
-	api.Get("/health", handlers.HealthCheck)
+	app.Get("/docs/*", swagger.HandlerDefault)
+	app.Get("health", deps.AppController.Health)
 
-	auth := api.Group("/auth")
-
+	auth := app.Group("/auth")
 	auth.Post("/register", deps.AuthController.Register)
 	auth.Post("/login", deps.AuthController.Login)
-	auth.Get("/me",
-		deps.Filter(
-			user_domain.AdminPermission,
-			user_domain.CustomerPermission,
-		),
-		deps.AuthController.Me,
-	)
+	auth.Get(`/me`, filter(user_domain.AdminPermission, user_domain.CustomerPermission), deps.AuthController.Me)
 	auth.Patch("/refresh", deps.AuthController.Refresh)
-	auth.Get("/sessions", deps.Filter(), deps.AuthController.GetSessions)
+	auth.Get("/sessions", filter(), deps.AuthController.GetSessions)
+	auth.Post("/logout", filter(), deps.AuthController.Logout)
+
+	users := app.Group("/users")
+	users.Get("/:id", filter(), deps.UserController.GetByID)
+
+	flights := app.Group("/flight")
+	flights.Get("/cities", deps.FlightController.FindCitiesByName)
 
 	cleanup := func() {
 		deps.Close()
-		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+		shutdownCtx, shutdownCancel := context.WithTimeout(
+			context.Background(),
+			30*time.Second,
+		)
 		defer shutdownCancel()
 
 		if err := app.ShutdownWithContext(shutdownCtx); err != nil {

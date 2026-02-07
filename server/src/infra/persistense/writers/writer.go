@@ -21,28 +21,28 @@ type TransactionWriter struct {
 	ctx context.Context
 }
 
-func (ths TransactionWriter) SaveFlight(flight *flight_domain.Flight) error {
-	return saveFlight(ths.ctx, ths.txn, flight)
+func (ths TransactionWriter) SaveFlight(flight *flight_domain.Flight, oth ...*flight_domain.Flight) error {
+	return saveFlight(ths.ctx, ths.txn, flight, oth...)
 }
 
-func (ths TransactionWriter) SaveFlightSeat(flightSeat *flight_domain.FlightSeat) error {
-	return saveFlightSeat(ths.ctx, ths.txn, flightSeat)
+func (ths TransactionWriter) SaveFlightSeat(flightSeat *flight_domain.FlightSeat, oth ...*flight_domain.FlightSeat) error {
+	return saveFlightSeat(ths.ctx, ths.txn, flightSeat, oth...)
 }
 
-func (ths TransactionWriter) SavePlane(plane *plane_domain.Plane) error {
-	return savePlane(ths.ctx, ths.txn, plane)
+func (ths TransactionWriter) SavePlane(plane *plane_domain.Plane, oth ...*plane_domain.Plane) error {
+	return savePlane(ths.ctx, ths.txn, plane, oth...)
 }
 
-func (ths TransactionWriter) SaveSeat(seat *plane_domain.Seat) error {
-	return saveSeat(ths.ctx, ths.txn, seat)
+func (ths TransactionWriter) SaveSeat(seat *plane_domain.Seat, oth ...*plane_domain.Seat) error {
+	return saveSeat(ths.ctx, ths.txn, seat, oth...)
 }
 
-func (ths TransactionWriter) SaveTicket(ticket *booking_domain.Ticket) error {
-	return saveTicket(ths.ctx, ths.txn, ticket)
+func (ths TransactionWriter) SaveTicket(ticket *booking_domain.Ticket, oth ...*booking_domain.Ticket) error {
+	return saveTicket(ths.ctx, ths.txn, ticket, oth...)
 }
 
-func (ths TransactionWriter) SaveUser(user *user_domain.User) error {
-	return saveUser(ths.ctx, ths.txn, user)
+func (ths TransactionWriter) SaveUser(user *user_domain.User, oth ...*user_domain.User) error {
+	return saveUser(ths.ctx, ths.txn, user, oth...)
 }
 
 func (txm *Writer) Execute(

@@ -7,9 +7,9 @@ import (
 )
 
 type DepsModule struct {
-	writer    interfaces.IWriter
-	planeRdr  plane_domain.IReader
-	flightRdr flight_domain.IReader
+	Writer    interfaces.IWriter
+	PlaneRdr  plane_domain.IReader
+	FlightRdr flight_domain.IReader
 }
 
 type UseCase struct {

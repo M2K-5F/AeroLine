@@ -1,6 +1,7 @@
 package main
 
 import (
+	flight_usecases "aeroline/src/application/usecases/flight"
 	user_usecase "aeroline/src/application/usecases/user"
 	"aeroline/src/infra/persistense/database"
 	"aeroline/src/infra/persistense/readers"
@@ -20,9 +21,12 @@ type Filters struct {
 }
 
 type Dependencies struct {
-	AuthController *controllers.AuthController
-	Filter         rest_auth.PermissionFilter
-	Close          func()
+	AuthController   *controllers.AuthController
+	AppController    *controllers.AppController
+	UserController   *controllers.UserController
+	FlightController *controllers.FlightController
+	Filter           rest_auth.PermissionFilter
+	Close            func()
 }
 
 func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
@@ -40,8 +44,8 @@ func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
 	writer := writers.NewWriter(pool)
 
 	userReader := readers.NewUserReader(pool)
-	// planeReader := readers.NewPlaneReader(pool)
-	// flightReader := readers.NewFlightReader(pool)
+	planeReader := readers.NewPlaneReader(pool)
+	flightReader := readers.NewFlightReader(pool)
 	// bookingReader := readers.NewBookingReader(pool)
 
 	tokenService := rest_auth.NewAuthService(client, rest_auth.NewConfigFromEnv(), userReader)
@@ -52,12 +56,22 @@ func ResolveDependencies(ctx context.Context) (*Dependencies, error) {
 		Writer:  writer,
 		UserRdr: userReader,
 	})
+	flightUC := flight_usecases.New(&flight_usecases.DepsModule{
+		Writer:    writer,
+		FlightRdr: flightReader,
+		PlaneRdr:  planeReader,
+	})
 
 	authCtrlr := controllers.NewAuthController(userUC, tokenService)
+	userCtrlr := controllers.NewUserControllers(userUC)
+	flightCtrlr := controllers.NewFlightController(*flightUC)
 
 	return &Dependencies{
-		AuthController: authCtrlr,
-		Filter:         filter,
+		AuthController:   authCtrlr,
+		Filter:           filter,
+		AppController:    &controllers.AppController{},
+		UserController:   userCtrlr,
+		FlightController: flightCtrlr,
 		Close: func() {
 			pool.Close()
 			client.Close()
